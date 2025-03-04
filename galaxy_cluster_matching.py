@@ -33,6 +33,30 @@ dataframe of galaxies
 """
 
 
+# def match_galaxies_and_clusters(galaxy_dataframe: pd.DataFrame, cluster_dataframe: pd.DataFrame):
+#     """
+#     This is the main function.
+#     """
+#     galaxy_dataframe['environment'] = "Field"
+#     galaxy_dataframe['cluster_mass'] = None
+#     galaxy_dataframe['cluster_name'] = None
+#
+#     for i, galaxy in galaxy_dataframe.iterrows():
+#
+#         for j, cluster in cluster_dataframe.iterrows():
+#             if compare_position(galaxy_ra=galaxy['RA'], galaxy_dec=galaxy['DEC'], cluster_ra=cluster['RA'], cluster_dec=cluster['DEC'], cluster_z=cluster['z'], cluster_radius_Mpc=cluster['cluster_radius_Mpc']):
+#                 if compare_redshift(cluster_z=cluster['z'], cluster_Velocity_Dispersion=cluster['cluster_Velocity_Dispersion'], galaxy_z=galaxy['z']):
+#                     galaxy_dataframe.at[i, 'environment'] = "ClusterMember"
+#                     galaxy_dataframe.at[i, 'cluster_radius'] = cluster['cluster_radius_Mpc']
+#                     # galaxy_dataframe.at[i, 'cluster_MASS'] = cluster['cluster_MASS']
+#                     galaxy_dataframe.at[i, 'cluster_name'] = cluster['c_NAME']
+#
+#         sys.stdout.write('\r')
+#         sys.stdout.write(f'Progress: {i / len(galaxy_dataframe) * 100}%')
+#         sys.stdout.flush()
+#     return galaxy_dataframe
+
+
 def match_galaxies_and_clusters(galaxy_dataframe: pd.DataFrame, cluster_dataframe: pd.DataFrame):
     """
     This is the main function.
@@ -42,13 +66,34 @@ def match_galaxies_and_clusters(galaxy_dataframe: pd.DataFrame, cluster_datafram
     galaxy_dataframe['cluster_name'] = None
 
     for i, galaxy in galaxy_dataframe.iterrows():
-
         for j, cluster in cluster_dataframe.iterrows():
-            if compare_position(galaxy_ra=galaxy['RA'], galaxy_dec=galaxy['DEC'], cluster_ra=cluster['RA'], cluster_dec=cluster['DEC'], cluster_z=cluster['z'], cluster_radius_Mpc=cluster['cluster_radius_Mpc']):
-                if compare_redshift(cluster_z=cluster['z'], cluster_Velocity_Dispersion=cluster['cluster_Velocity_Dispersion'], galaxy_z=galaxy['z']):
+            if compare_position(
+                    galaxy_ra=galaxy['RA'], galaxy_dec=galaxy['DEC'],
+                    cluster_ra=cluster['RA'], cluster_dec=cluster['DEC'],
+                    cluster_z=cluster['z'], cluster_radius_Mpc=cluster['cluster_radius_Mpc']
+            ):
+
+                # Check if the cluster has velocity dispersion
+                if not pd.isna(cluster['cluster_Velocity_Dispersion']):
+                    redshift_match = compare_redshift(
+                        cluster_z=cluster['z'],
+                        cluster_Velocity_Dispersion=cluster['cluster_Velocity_Dispersion'],
+                        galaxy_z=galaxy['z']
+                    )
+                else:
+                    # If no velocity dispersion, check BEST_Z_TYPE_1
+                    if cluster['z_type'] != "photo_z":
+                        redshift_match = compare_redshift(
+                            cluster_z=cluster['z'],
+                            cluster_Velocity_Dispersion=0,  # Effectively ignores velocity dispersion
+                            galaxy_z=galaxy['z']
+                        )
+                    else:
+                        redshift_match = False
+
+                if redshift_match:
                     galaxy_dataframe.at[i, 'environment'] = "ClusterMember"
                     galaxy_dataframe.at[i, 'cluster_radius'] = cluster['cluster_radius_Mpc']
-                    # galaxy_dataframe.at[i, 'cluster_MASS'] = cluster['cluster_MASS']
                     galaxy_dataframe.at[i, 'cluster_name'] = cluster['c_NAME']
 
         sys.stdout.write('\r')

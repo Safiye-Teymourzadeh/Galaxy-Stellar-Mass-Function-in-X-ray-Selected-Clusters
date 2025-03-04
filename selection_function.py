@@ -5,8 +5,8 @@ from astropy import units as u
 from constants import SUN_ABSOLUTE_MAGNITUDE, LOG_MASS_LUMINOSITY_RATIO_BINS
 
 
-def filter_for_richards_curve(richards_curve:np.array, masses_of_richards_curve:np.array, mass_of_galaxy:float, distance_of_galaxy:float) -> bool:
-    max_distance = np.interp(mass_of_galaxy, masses_of_richards_curve, richards_curve)
+def filter_for_selection_function(selection_function:np.array, masses_of_selection_function:np.array, mass_of_galaxy:float, distance_of_galaxy:float) -> bool:
+    max_distance = np.interp(mass_of_galaxy, masses_of_selection_function, selection_function)
     if distance_of_galaxy > max_distance:
         return False
     else:
@@ -39,13 +39,20 @@ def get_mass_luminosity_cutoff(galaxy_df: pd.DataFrame, cut_off_percentage: floa
 
 def get_mass_luminosity_histogram(galaxy_df: pd.DataFrame) -> (np.ndarray, np.ndarray):
     # get the luminosity distance from z
-    # distances = cosmo.comoving_distance(galaxy_df['z']).value
     distances = galaxy_df['comoving_distance']
     # get the luminosity from flux and distance
     luminosities = [get_luminosity_from_flux_and_distance(flux, distance) for (flux, distance) in
                     zip(galaxy_df['flux'], distances)]
     # calculate the ratios
-    log_mass_luminosity_ratios = np.log10(galaxy_df['mstar'] / luminosities)
+    log_mass_luminosity_ratios = (galaxy_df['mstar'] / luminosities)
+    # log_mass_luminosity_ratios = np.log10(galaxy_df['mstar'] / luminosities)
+
+
+    # print mstar, luminosity, and log_mass_luminosity_ratios
+    for mstar, luminosity, ratio in zip(galaxy_df['mstar'], luminosities, log_mass_luminosity_ratios):
+        print(f"mstar: {mstar}, Luminosity: {luminosity}, Mass-to-Light Ratio: {ratio}")
+
+
     # create the ratio-histogram
     return histogram(log_mass_luminosity_ratios, LOG_MASS_LUMINOSITY_RATIO_BINS)
 

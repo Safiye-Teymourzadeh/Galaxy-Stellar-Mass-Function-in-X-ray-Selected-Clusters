@@ -31,9 +31,9 @@ def get_weighted_mass_histogram(input_mass_completeness_dataframe: pd.DataFrame,
     """
     this is the main function
     """
-    filtered_by_region_dataframe = input_mass_completeness_dataframe[input_mass_completeness_dataframe['region'] == region_name]
-    mass_column = filtered_by_region_dataframe['mstar']
-    completeness_column = filtered_by_region_dataframe['completeness']
+    # filtered_by_region_dataframe = input_mass_completeness_dataframe[input_mass_completeness_dataframe['region'] == region_name]
+    mass_column = input_mass_completeness_dataframe['mstar']
+    completeness_column = input_mass_completeness_dataframe['completeness']
     # volume_richard_curve = get_region_volume(region_name=region_name, mass_list=mass_column)
     # weight = np.log(10) / (volume_richard_curve * completeness_column * DEX)
     weight = np.log(10) / (completeness_column * DEX)
@@ -42,15 +42,6 @@ def get_weighted_mass_histogram(input_mass_completeness_dataframe: pd.DataFrame,
 
     return mass_histogram, histogram_errors
 
-# def get_weighted_mass_histogram_cluster_galaxies(input_mass_completeness_dataframe: pd.DataFrame, region_name: str):
-#     filtered_by_region_dataframe = input_mass_completeness_dataframe[input_mass_completeness_dataframe['region'] == region_name]
-#     mass_column = filtered_by_region_dataframe['mstar']
-#     completeness_column = filtered_by_region_dataframe['completeness']
-#     weight = np.log(10) / (completeness_column * DEX)
-#     mass_histogram = np.histogram(mass_column, MASS_BINS, weights=weight)[0]
-#     histogram_errors = np.sqrt(np.histogram(mass_column, MASS_BINS, weights=weight**2)[0])
-#
-#     return mass_histogram, histogram_errors
 
 
 # Function to get the volume of each region
