@@ -49,8 +49,8 @@ def get_mass_luminosity_histogram(galaxy_df: pd.DataFrame) -> (np.ndarray, np.nd
 
 
     # print mstar, luminosity, and log_mass_luminosity_ratios
-    for mstar, luminosity, ratio in zip(galaxy_df['mstar'], luminosities, log_mass_luminosity_ratios):
-        print(f"mstar: {mstar}, Luminosity: {luminosity}, Mass-to-Light Ratio: {ratio}")
+    # for mstar, luminosity, ratio in zip(galaxy_df['mstar'], luminosities, log_mass_luminosity_ratios):
+    #     print(f"mstar: {mstar}, Luminosity: {luminosity}, Mass-to-Light Ratio: {ratio}")
 
 
     # create the ratio-histogram

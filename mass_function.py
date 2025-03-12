@@ -27,7 +27,7 @@ galaxy mass function
 
 
 # Function to get the weighted histogram of the objects of each region
-def get_weighted_mass_histogram(input_mass_completeness_dataframe: pd.DataFrame, region_name: str):
+def get_weighted_mass_histogram(input_mass_completeness_dataframe: pd.DataFrame):
     """
     this is the main function
     """
@@ -45,14 +45,14 @@ def get_weighted_mass_histogram(input_mass_completeness_dataframe: pd.DataFrame,
 
 
 # Function to get the volume of each region
-def get_region_volume(region_name: str, mass_list: list, mass_luminosity_cutoff):
-    region = REGIONS_OF_SKY[region_name]
-    region_area = calculate_patch_area(patch=region, nside=NSIDE)
-    average_pixel_area = 4 * np.pi / (12 * NSIDE**2)
-    total_area_sphere = hp.nside2npix(NSIDE) * average_pixel_area
-    fraction_region = region_area / total_area_sphere
-    # return calculate_volume([get_distance_from_mass(np.log10(mass)) for mass in mass_list], fraction_region)
-    return calculate_volume([get_distance_from_mass(mass, mass_luminosity_cutoff) for mass in mass_list], fraction_region)
+# def get_region_volume(region_name: str, mass_list: list, mass_luminosity_cutoff):
+#     region = REGIONS_OF_SKY[region_name]
+#     region_area = calculate_patch_area(patch=region, nside=NSIDE)
+#     average_pixel_area = 4 * np.pi / (12 * NSIDE**2)
+#     total_area_sphere = hp.nside2npix(NSIDE) * average_pixel_area
+#     fraction_region = region_area / total_area_sphere
+#     # return calculate_volume([get_distance_from_mass(np.log10(mass)) for mass in mass_list], fraction_region)
+#     return calculate_volume([get_distance_from_mass(mass, mass_luminosity_cutoff) for mass in mass_list], fraction_region)
 
 
 
@@ -61,24 +61,24 @@ def get_cluster_volume(radius):
 
 
 # Function to calculate the area for a given patch
-def calculate_patch_area(patch: dict, nside: int=NSIDE):
-    RA_min, RA_max = np.deg2rad(patch['RAcen'])
-    DEC_min, DEC_max = np.deg2rad(patch['DECcen'])
-
-    # Calculate the pixel indices for the given patch
-    pix_indices = np.arange(hp.nside2npix(nside))
-    pix_indices_patch = pix_indices[
-        (hp.pixelfunc.pix2ang(nside, pix_indices)[0] >= np.pi/2 - DEC_max) &
-        (hp.pixelfunc.pix2ang(nside, pix_indices)[0] <= np.pi/2 - DEC_min) &
-        (hp.pixelfunc.pix2ang(nside, pix_indices)[1] >= RA_min) &
-        (hp.pixelfunc.pix2ang(nside, pix_indices)[1] <= RA_max)
-    ]
-
-    # Calculate the area of the given patch using the average solid angle of a pixel
-    average_pixel_area = 4 * np.pi / (12 * nside**2)
-    patch_area = len(pix_indices_patch) * average_pixel_area
-
-    return patch_area
+# def calculate_patch_area(patch: dict, nside: int=NSIDE):
+#     RA_min, RA_max = np.deg2rad(patch['RAcen'])
+#     DEC_min, DEC_max = np.deg2rad(patch['DECcen'])
+#
+#     # Calculate the pixel indices for the given patch
+#     pix_indices = np.arange(hp.nside2npix(nside))
+#     pix_indices_patch = pix_indices[
+#         (hp.pixelfunc.pix2ang(nside, pix_indices)[0] >= np.pi/2 - DEC_max) &
+#         (hp.pixelfunc.pix2ang(nside, pix_indices)[0] <= np.pi/2 - DEC_min) &
+#         (hp.pixelfunc.pix2ang(nside, pix_indices)[1] >= RA_min) &
+#         (hp.pixelfunc.pix2ang(nside, pix_indices)[1] <= RA_max)
+#     ]
+#
+#     # Calculate the area of the given patch using the average solid angle of a pixel
+#     average_pixel_area = 4 * np.pi / (12 * nside**2)
+#     patch_area = len(pix_indices_patch) * average_pixel_area
+#
+#     return patch_area
 
 
 # Function to calculate volume (Mpc^3)
